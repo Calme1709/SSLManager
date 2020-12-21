@@ -3,6 +3,9 @@
 	"version": "1.0.0",
 	"description": "",
 	"main": "index.js",
+	"engines": {
+		"node": ">=14.0.0"
+	},
 	"scripts": {
 		"start": "NODE_TLS_REJECT_UNAUTHORIZED=0 NODE_ENV=staging npx back-end-config start",
 		"build": "npx back-end-config build",
