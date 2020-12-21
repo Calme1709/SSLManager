@@ -1,7 +1,6 @@
 import https from "https";
 import { Buffer } from "buffer";
-import { JsonOptions, toJson } from "xml2json";
-import { Logger, ControlledError } from "@utils";
+import { Logger, ControlledError, parseXmlToJson } from "@utils";
 import { PleskApi } from "..";
 
 interface IApiErrorResponse {
@@ -81,9 +80,7 @@ export default class Operator<OperatorName extends string> {
 				response.on("data", chunk => data += chunk );
 
 				response.on("end", () => {
-					const toJsonOptions = { object: true, coerce: true, trim: true, sanitize: true } as JsonOptions;
-
-					const result = toJson(data, toJsonOptions) as unknown as ApiResponse<OperatorName, OperationName, ResponseType>;
+					const result = parseXmlToJson<ApiResponse<OperatorName, OperationName, ResponseType>>(data);
 
 					//TODO: Custom parsing of Arrays (admin-domain-list, property, etc)
 					if("system" in result.packet) {
