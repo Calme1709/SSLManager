@@ -13,7 +13,7 @@ import { ControlledError } from "@utils";
 export default (schema: Schema, dataToValidate: "body" | "query" = "query") => (req: Request, {}, next: NextFunction) => {
 	const result = schema.validate(req[dataToValidate]);
 
-	if(result.error) {
+	if(result.error !== undefined) {
 		next(new ControlledError(422, result.error.details[0].message.replace(/"/g, "'")));
 	}
 
