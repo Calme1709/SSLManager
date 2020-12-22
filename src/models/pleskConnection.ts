@@ -8,6 +8,9 @@ export class PleskConnection {
 	public ipAddress!: string;
 
 	@prop()
+	public friendlyName!: string;
+
+	@prop()
 	public login!: string;
 
 	@prop()

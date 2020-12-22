@@ -77,7 +77,7 @@ export default class Operator<OperatorName extends string> {
 			}, response => {
 				let data = "";
 
-				response.on("data", chunk => data += chunk );
+				response.on("data", chunk => data += chunk);
 
 				response.on("end", () => {
 					const result = parseXmlToJson<ApiResponse<OperatorName, OperationName, ResponseType>>(data);

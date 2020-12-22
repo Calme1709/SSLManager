@@ -25,7 +25,6 @@ export class PleskApi {
 	 * The JavaScript API for the external XML Plesk API.
 	 *
 	 * @param ipAddress - The IP of the external Plesk server.
-	 * @param useHttps - Use HTTPS instead of HTTP when making requests to the Plesk API.
 	 */
 	public constructor(ipAddress: string) {
 		this.ipAddress = ipAddress;
@@ -155,8 +154,6 @@ export class PleskApi {
  * @param ipAddress - The API of the remote plesk machine.
  * @param credentials - The credentials to use to log in for this API connection, this is only required for first log in
  * 	for this remote host, a secret key will then be generated and used for all subsequent requests.
- * @param https - Use HTTPS instead of HTTP when making requests to the Plesk API. This will default to the value stored
- * 	in the database, and if this does not exist it will default to true.
  *
  * @returns A Plesk API connection.
  */
