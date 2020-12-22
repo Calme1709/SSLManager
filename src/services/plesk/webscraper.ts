@@ -57,7 +57,7 @@ export default class PleskWebScraper {
 
 			const { sessionInfo } = pleskInfo;
 
-			if(sessionInfo.expiration > Date.now()) {
+			if(sessionInfo.expiration > Date.now() + (new Date().getTimezoneOffset())) {
 				this.sessionInfo = sessionInfo;
 			} else {
 				const connection = await getPleskApi(this.ipAddress);
@@ -84,11 +84,10 @@ export default class PleskWebScraper {
 						expiration: Date.now() + idleTime
 					};
 				} else {
-					//TODO: Handle differing timezones between host and remote plesk instance.
 					this.sessionInfo = { cookie: sessionInfo.cookie, expiration: Date.parse(session.idle) + idleTime };
 				}
 
-				pleskInfo.update({ sessionInfo: this.sessionInfo });
+				await pleskInfo.update({ sessionInfo: this.sessionInfo });
 			}
 		}
 
