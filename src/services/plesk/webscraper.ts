@@ -1,7 +1,8 @@
 import { PleskConnectionModel } from "@models/pleskConnection";
 import parseHtml from "node-html-parser";
 import { launch } from "puppeteer";
-import PleskSessionHandler from "./pleskSessionHandler";
+import getPleskApi from "@services/external/plesk/index";
+import { getIpAddress } from "@utils";
 
 /**
  * Provides Plesk web-scraping functionality for this application, this is useful to harness features of
@@ -10,7 +11,7 @@ import PleskSessionHandler from "./pleskSessionHandler";
 export default class PleskWebScraper {
 	private readonly ipAddress: string;
 
-	private cookie?: string;
+	private sessionInfo: { cookie: string; expiration: number } = { cookie: "", expiration: 0 };
 
 	private useHttps?: boolean;
 
@@ -51,22 +52,47 @@ export default class PleskWebScraper {
 	 * @returns The cookie.
 	 */
 	private async getCookie() {
-		if(this.cookie === undefined) {
+		if(this.sessionInfo.expiration < Date.now()) {
 			const pleskInfo = (await PleskConnectionModel.findOne({ ipAddress: this.ipAddress }).exec())!;
 
-			if(pleskInfo.cookie === undefined || Date.now() > pleskInfo.cookieExpiry! - (10 * 1000)) {
-				const { cookie, cookieExpiry } = await PleskSessionHandler.getNewCookie(this.ipAddress);
+			const { sessionInfo } = pleskInfo;
 
-				//TODO: Remove old session cookie from plesk if it still exists
-				await pleskInfo.updateOne({ cookie, cookieExpiry });
-
-				this.cookie = cookie;
+			if(sessionInfo.expiration > Date.now()) {
+				this.sessionInfo = sessionInfo;
 			} else {
-				this.cookie = pleskInfo.cookie;
+				const connection = await getPleskApi(this.ipAddress);
+
+				const session = (await connection.session.get()).find(({ id }) => id === sessionInfo.cookie);
+				const idleTime = (await connection.server.get()).session_setup.login_timeout * 60 * 1000;
+
+				if(session === undefined) {
+					//Generate a new session.
+					const sessionId = await connection.server.create_session(pleskInfo.login, {
+						user_ip: await getIpAddress(this.ipAddress),
+						back_url: ""
+					});
+
+					const browser = await launch({ headless: false });
+					const page = await browser.newPage();
+
+					await page.goto(`${pleskInfo.useHttps ? "https" : "http"}://${this.ipAddress}:${pleskInfo.useHttps ? 8443 : 8880}/enterprise/rsession_init.php?PLESKSESSID=${sessionId}`);
+
+					browser.close().catch(console.error);
+
+					this.sessionInfo = {
+						cookie: sessionId,
+						expiration: Date.now() + idleTime
+					};
+				} else {
+					//TODO: Handle differing timezones between host and remote plesk instance.
+					this.sessionInfo = { cookie: sessionInfo.cookie, expiration: Date.parse(session.idle) + idleTime };
+				}
+
+				pleskInfo.update({ sessionInfo: this.sessionInfo });
 			}
 		}
 
-		return this.cookie;
+		return this.sessionInfo.cookie;
 	}
 
 	/**

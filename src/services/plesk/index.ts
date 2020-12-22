@@ -28,7 +28,11 @@ export default class PleskService {
 			login: credentials.login,
 			ipAddress: ip,
 			apiKey,
-			useHttps
+			useHttps,
+			sessionInfo: {
+				expiration: 0,
+				cookie: ""
+			}
 		});
 	}
 }

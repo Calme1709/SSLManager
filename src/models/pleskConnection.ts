@@ -14,10 +14,10 @@ export class PleskConnection {
 	public apiKey!: string;
 
 	@prop()
-	public cookie?: string;
-
-	@prop()
-	public cookieExpiry?: number;
+	public sessionInfo!: {
+		cookie: string;
+		expiration: number;
+	};
 
 	@prop()
 	public useHttps!: boolean;
