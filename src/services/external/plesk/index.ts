@@ -1,8 +1,8 @@
-import { Operator, SecretKey, Server, Test, Certificate, Webspace } from "./operators";
+import { Operator, SecretKey, Server, Test, Certificate, Webspace, Session } from "./operators";
 
 import { PleskConnectionModel } from "@models/pleskConnection";
 
-type OperatorName = "secret_key" | "certificate" | "server" | "webspace";
+type OperatorName = "secret_key" | "certificate" | "server" | "webspace" | "session";
 
 export interface IPleskCredentials {
 	login: string;
@@ -88,6 +88,15 @@ export class PleskApi {
 	}
 
 	/**
+	 * The session operator.
+	 *
+	 * @returns The session operator.
+	 */
+	public get session() {
+		return this.getOperator("session") as unknown as Session;
+	}
+
+	/**
 	 * Test the connection to a remote plesk instance.
 	 */
 	public async testConnection() {
@@ -125,6 +134,10 @@ export class PleskApi {
 
 			case "webspace":
 				operator = new Webspace(this);
+				break;
+
+			case "session":
+				operator = new Session(this);
 				break;
 			default:
 				break;
