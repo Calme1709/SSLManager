@@ -1,5 +1,6 @@
 import Operator from "./base";
 import { PleskApi } from "..";
+import { IFilter } from ".";
 
 export interface ICertificateContent {
 	csr: string;
@@ -131,45 +132,36 @@ export default class Certificate extends Operator<"certificate"> {
 	}
 
 	/**
-	 * Get a list of all certificates matching a filter.
+	 * Get a list of certificates installed on the remote Plesk instance.
 	 *
-	 * @param filterType - This specifies the type of filter being used, either;
+	 * @param filter - The filter for which domain to get certificates for. If this is undefined the admin repository will be returned.
 	 *
-	 * id - Domain ID
-	 *
-	 * guid - Domain GUID
-	 *
-	 * name - Domain Name
-	 *
-	 * @param filterValue - The value of the filter.
-	 *
-	 * @param admin - Whether to retrieve admin certificates.
-	 *
-	 * @returns A list of certificates that match the filter
+	 * @returns A list of certificates.
 	 */
 	//eslint-disable-next-line @typescript-eslint/naming-convention
-	public async get_pool<FilterType extends "id" | "guid" | "name" | undefined>(
-		filterType: FilterType,
-		filterValue: FilterType extends string ? string : undefined,
-		admin?: boolean
-	) {
-		//TODO: Migrate to new filter method
+	public async get_pool(filter?: IFilter<"domain-id" | "domain-name" | "domain-guid">) {
 		interface IResponse {
-			certificates: Array<{
-				name: string;
-			}>;
+			certificates: {
+				certificate: { name: string } | Array<{ name: string }>
+			};
 		}
 
-		return (await this.xmlApiRequest<IResponse, string>(
+		const result = (await this.xmlApiRequest<IResponse, string>(
 			"get-pool",
 			[
-				admin === true ?
+				filter === undefined ?
 					this.createDataNode("admin", "") :
-					this.createOptionalDataNode(
+					this.createDataNode(
 						"filter",
-						[ this.createOptionalDataNode(`domain-${filterType ?? ""}`, filterValue) ]
+						[ this.createOptionalDataNode(filter.filterType, filter.filter) ]
 					)
 			]
-		)).certificates;
+		)).certificates.certificate;
+
+		if(Array.isArray(result)) {
+			return result.map(el => el.name);
+		}
+
+		return [ result.name ];
 	}
 }
