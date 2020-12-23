@@ -1,6 +1,6 @@
 import { PleskConnectionModel } from "@models/pleskConnection";
 import parseHtml from "node-html-parser";
-import { launch } from "puppeteer";
+import { Browser, launch } from "puppeteer";
 import getPleskApi from "@services/external/plesk/index";
 import { getIpAddress } from "@utils";
 
@@ -14,6 +14,8 @@ export default class PleskWebScraper {
 	private sessionInfo: { cookie: string; expiration: number } = { cookie: "", expiration: 0 };
 
 	private useHttps?: boolean;
+
+	private browser?: Browser;
 
 	/**
 	 * Plesk web-scraper, this is useful for .
@@ -110,6 +112,19 @@ export default class PleskWebScraper {
 	}
 
 	/**
+	 * Get a new browser page.
+	 *
+	 * @returns The new puppeteer browser page.
+	 */
+	private async getNewPage() {
+		if(this.browser === undefined) {
+			this.browser = await launch({ headless: false });
+		}
+
+		return this.browser.newPage();
+	}
+
+	/**
 	 * Get the HTML dom from a specified path.
 	 *
 	 * @param path - The path to retrieve the HTML for.
@@ -120,8 +135,7 @@ export default class PleskWebScraper {
 		const useHttps = await this.shouldUseHttps();
 		const cookie = await this.getCookie();
 
-		const browser = await launch({ headless: false });
-		const page = await browser.newPage();
+		const page = await this.getNewPage();
 
 		await page.setExtraHTTPHeaders({ Cookie: `PLESKSESSID${useHttps ? "" : "_INSECURE"}=${cookie}` });
 
@@ -129,7 +143,7 @@ export default class PleskWebScraper {
 
 		const html = await page.$eval("html", element => element.innerHTML);
 
-		browser.close().catch(console.error);
+		await page.close();
 
 		return parseHtml(html);
 	}
