@@ -23,6 +23,20 @@ interface IGetResponse {
 		];
 	};
 
+	"admin-domain-list": {
+		domain: Array<{
+			id: number;
+			name: string;
+			"ascii-name": string;
+			type: "domain" | "alias" | "subdomain";
+			main: boolean;
+			guid: string;
+			"external-id": string;
+			"parent-id": number;
+			"domain-id": number;
+		}>;
+	};
+
 	//TODO: add typings for the other parts of the response.
 	session_setup: {
 		login_timeout: number;
