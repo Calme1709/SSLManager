@@ -27,22 +27,36 @@ export default class PleskWebScraper {
 	}
 
 	/**
-	 * Get details about an SSL certificate.
+	 * Get the certificate details (csr, pvt, crt, ca and name) of the currently active SSL certificate for a domain.
 	 *
-	 * @param domainId - The ID of the domain which the ssl certificate is associated with.
-	 * @param certificateId - The ID of the certificate.
+	 * @param domainId - The ID of the domain to retrieve the SSL certificate information of.
 	 *
-	 * @returns The details about the certificate.
+	 * @returns The information about the domains SSL certificate.
 	 */
-	public async getCertificateDetails(domainId: number, certificateId: number) {
-		const html = await this.getHtml(`smb/ssl-certificate/edit/id/${domainId}/certificateId/${certificateId}`);
+	public async getActiveCertDetails(domainId: number) {
+		const connection = await getPleskApi("192.168.1.179");
 
-		const crt = html.querySelector("#infoCertificate-content-area").innerText.replace(/\n/g, "");
-		const ca = html.querySelector("#infoCaCertificate-content-area").innerText.replace(/\n/g, "");
+		const siteInfo = (await connection.site.get({ type: "id", value: domainId }));
+
+		if(siteInfo.data.hosting.vrt_hst.property.certificate_name === undefined) {
+			return undefined;
+		}
+
+		const listHtml = await this.getHtml(`/smb/ssl-certificate/list/id/${domainId}`);
+
+		const certUrl = listHtml.querySelectorAll("#ssl-certificate-list-table tbody tr td a")
+			.find(({ classNames, innerText }) => classNames.length === 0 && innerText === siteInfo.data.hosting.vrt_hst.property.certificate_name)!
+			.getAttribute("href")!;
+
+		const certHtml = await this.getHtml(certUrl);
+
+		const crt = certHtml.querySelector("#infoCertificate-content-area").innerText;
+		const ca = certHtml.querySelector("#infoCaCertificate-content-area").innerText;
 
 		return {
-			csr: html.querySelector("#infoCsr-content-area").innerText.replace(/\n/g, ""),
-			pvt: html.querySelector("#infoPrivateKey-content-area").innerText.replace(/\n/g, ""),
+			name: siteInfo.data.hosting.vrt_hst.property.certificate_name,
+			csr: certHtml.querySelector("#infoCsr-content-area").innerText,
+			pvt: certHtml.querySelector("#infoPrivateKey-content-area").innerText,
 			crt: crt === "The component is missing." ? undefined : crt,
 			ca: ca === "The component is missing." ? undefined : ca
 		};
@@ -64,7 +78,7 @@ export default class PleskWebScraper {
 			} else {
 				const connection = await getPleskApi(this.ipAddress);
 
-				const session = (await connection.session.get()).find(({ id }) => id === sessionInfo.cookie);
+				const session = (await connection.session.get()).find(sess => sess !== undefined && sess.id === sessionInfo.cookie);
 				const idleTime = (await connection.server.get()).session_setup.login_timeout * 60 * 1000;
 
 				if(session === undefined) {
@@ -89,7 +103,7 @@ export default class PleskWebScraper {
 					this.sessionInfo = { cookie: sessionInfo.cookie, expiration: Date.parse(session.idle) + idleTime };
 				}
 
-				await pleskInfo.update({ sessionInfo: this.sessionInfo });
+				await pleskInfo.updateOne({ sessionInfo: this.sessionInfo });
 			}
 		}
 
@@ -142,8 +156,6 @@ export default class PleskWebScraper {
 		await page.goto(`${useHttps ? "https" : "http"}://${this.ipAddress}:${useHttps ? 8443 : 8880}/${path}`);
 
 		const html = await page.$eval("html", element => element.innerHTML);
-
-		await page.close();
 
 		return parseHtml(html);
 	}
