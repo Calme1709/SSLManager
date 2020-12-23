@@ -28,7 +28,7 @@ export default class Webspace extends Operator<"webspace"> {
 		return this.xmlApiRequest(
 			"get",
 			[
-				this.createDataNode("filter", this.createDataNode(filter.filterType, filter.filter)),
+				this.createDataNode("filter", this.createDataNode(filter.type, filter.value)),
 				this.createDataNode("dataset", [
 					this.createDataNode("gen_info", ""),
 					this.createDataNode("hosting", ""),

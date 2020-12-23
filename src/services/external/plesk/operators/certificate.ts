@@ -153,7 +153,7 @@ export default class Certificate extends Operator<"certificate"> {
 					this.createDataNode("admin", "") :
 					this.createDataNode(
 						"filter",
-						[ this.createOptionalDataNode(filter.filterType, filter.filter) ]
+						[ this.createOptionalDataNode(filter.type, filter.value) ]
 					)
 			]
 		)).certificates.certificate;

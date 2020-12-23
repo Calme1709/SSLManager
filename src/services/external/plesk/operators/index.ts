@@ -7,6 +7,6 @@ export { default as Webspace } from "./webspace";
 export { default as Session } from "./session";
 
 export interface IFilter<FilterType extends string, CustomFilterTypes extends Record<string, any> = Record<string, any>> {
-	filterType: FilterType;
-	filter: FilterType extends keyof CustomFilterTypes ? CustomFilterTypes[FilterType] : string;
+	type: FilterType;
+	value: FilterType extends keyof CustomFilterTypes ? CustomFilterTypes[FilterType] : string;
 }
