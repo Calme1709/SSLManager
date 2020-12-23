@@ -5,6 +5,7 @@ export { default as Test } from "./test";
 export { default as Certificate } from "./certificate";
 export { default as Webspace } from "./webspace";
 export { default as Session } from "./session";
+export { default as Site } from "./site";
 
 export interface IFilter<FilterType extends string, CustomFilterTypes extends Record<string, any> = Record<string, any>> {
 	type: FilterType;
