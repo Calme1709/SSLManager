@@ -31,7 +31,7 @@ export default class Session extends Operator<"session"> {
 		}
 
 		interface IResponse {
-			session: ISessionInfo | ISessionInfo[];
+			session: ISessionInfo | Array<ISessionInfo | undefined>;
 		}
 
 		const result = await this.xmlApiRequest<IResponse, string>("get", "");
