@@ -64,6 +64,8 @@ export default class Operator<OperatorName extends string> {
 		return new Promise<ResponseType>((resolve, reject) => {
 			const requestBody = `<?xml version="1.0" encoding="utf-8"?>${this.generatePacket(operation, dataNodes)}`;
 
+			console.log(requestBody);
+
 			const authHeaders = this.pleskApi.apiKey === undefined ?
 				{ HTTP_AUTH_LOGIN: (this.pleskApi.credentials!).login, HTTP_AUTH_PASSWD: (this.pleskApi.credentials!).password } :
 				{ KEY: this.pleskApi.apiKey };
@@ -174,7 +176,7 @@ export default class Operator<OperatorName extends string> {
 					</${operation}>
 				</${this.operatorName}>
 			</packet>
-		`.replace(/[\t\n]/g, "");
+		`.replace(/[\t]/g, "");
 	}
 
 	/**

@@ -96,16 +96,16 @@ export default class Certificate extends Operator<"certificate"> {
 	): Promise<{ csr: string; pvt: string }> {
 		return this.xmlApiRequest(
 			"generate",
-			[
-				this.createDataNode("name", name),
-				this.createDataNode("email", email),
+			this.createDataNode("info", [
 				this.createDataNode("bits", bits.toString()),
 				this.createDataNode("country", organizationalInfo.country),
 				this.createDataNode("state", organizationalInfo.region),
 				this.createDataNode("location", organizationalInfo.city),
 				this.createDataNode("company", organizationalInfo.companyName),
-				this.createOptionalDataNode("dept", organizationalInfo.companyDepartment)
-			]
+				this.createOptionalDataNode("dept", organizationalInfo.companyDepartment),
+				this.createDataNode("email", email),
+				this.createDataNode("name", name)
+			])
 		);
 	}
 
