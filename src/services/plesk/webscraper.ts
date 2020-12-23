@@ -1,8 +1,7 @@
 import { PleskConnectionModel } from "@models/pleskConnection";
 import parseHtml from "node-html-parser";
-import { Browser, launch } from "puppeteer";
 import getPleskApi from "@services/external/plesk/index";
-import { getIpAddress } from "@utils";
+import { getIpAddress, getPuppeteerBrowser } from "@utils";
 
 /**
  * Provides Plesk web-scraping functionality for this application, this is useful to harness features of
@@ -14,8 +13,6 @@ export default class PleskWebScraper {
 	private sessionInfo: { cookie: string; expiration: number } = { cookie: "", expiration: 0 };
 
 	private useHttps?: boolean;
-
-	private browser?: Browser;
 
 	/**
 	 * Plesk web-scraper, this is useful for .
@@ -88,12 +85,11 @@ export default class PleskWebScraper {
 						back_url: ""
 					});
 
-					const browser = await launch({ headless: false });
-					const page = await browser.newPage();
+					const page = await (await getPuppeteerBrowser()).newPage();
 
 					await page.goto(`${pleskInfo.useHttps ? "https" : "http"}://${this.ipAddress}:${pleskInfo.useHttps ? 8443 : 8880}/enterprise/rsession_init.php?PLESKSESSID=${sessionId}`);
 
-					browser.close().catch(console.error);
+					await page.close();
 
 					this.sessionInfo = {
 						cookie: sessionId,
@@ -126,19 +122,6 @@ export default class PleskWebScraper {
 	}
 
 	/**
-	 * Get a new browser page.
-	 *
-	 * @returns The new puppeteer browser page.
-	 */
-	private async getNewPage() {
-		if(this.browser === undefined) {
-			this.browser = await launch({ headless: false });
-		}
-
-		return this.browser.newPage();
-	}
-
-	/**
 	 * Get the HTML dom from a specified path.
 	 *
 	 * @param path - The path to retrieve the HTML for.
@@ -149,13 +132,15 @@ export default class PleskWebScraper {
 		const useHttps = await this.shouldUseHttps();
 		const cookie = await this.getCookie();
 
-		const page = await this.getNewPage();
+		const page = await (await getPuppeteerBrowser()).newPage();
 
 		await page.setExtraHTTPHeaders({ Cookie: `PLESKSESSID${useHttps ? "" : "_INSECURE"}=${cookie}` });
 
 		await page.goto(`${useHttps ? "https" : "http"}://${this.ipAddress}:${useHttps ? 8443 : 8880}/${path}`);
 
 		const html = await page.$eval("html", element => element.innerHTML);
+
+		await page.close();
 
 		return parseHtml(html);
 	}
