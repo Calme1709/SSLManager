@@ -162,15 +162,15 @@ export class PleskApi {
 }
 
 /**
- * Get a Plesk API.
+ * Generate a connection to a remote Plesk instance.
  *
- * @param ipAddress - The API of the remote plesk machine.
+ * @param ipAddress - The IP address of the remote plesk machine.
  * @param credentials - The credentials to use to log in for this API connection, this is only required for first log in
  * 	for this remote host, a secret key will then be generated and used for all subsequent requests.
  *
  * @returns A Plesk API connection.
  */
-const getPleskApi = async (ipAddress: string, credentials?: IPleskCredentials) => {
+const createPleskApiConnection = async (ipAddress: string, credentials?: IPleskCredentials) => {
 	const api = new PleskApi(ipAddress);
 
 	await api.connect(credentials);
@@ -178,6 +178,25 @@ const getPleskApi = async (ipAddress: string, credentials?: IPleskCredentials) =
 	await api.testConnection();
 
 	return api;
+};
+
+const apiCache: Record<string, Promise<PleskApi> | undefined> = {};
+
+/**
+ * Get a Plesk API.
+ *
+ * @param ipAddress - The ip address of the remote plesk machine.
+ * @param credentials - The credentials to use to log in for this API connection, this is only required for first log in
+ * 	for this remote host, a secret key will then be generated and used for all subsequent requests.
+ *
+ * @returns A Plesk API connection.
+ */
+const getPleskApi = (ipAddress: string, credentials?: IPleskCredentials) => {
+	if(apiCache[ipAddress] === undefined) {
+		apiCache[ipAddress] = createPleskApiConnection(ipAddress, credentials);
+	}
+
+	return apiCache[ipAddress]!;
 };
 
 export default getPleskApi;
