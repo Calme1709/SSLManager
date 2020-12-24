@@ -30,7 +30,7 @@ export default class PleskWebScraper {
 	 *
 	 * @returns The information about the domains SSL certificate.
 	 */
-	public async getActiveCertDetails(domainId: number) {
+	public async getDomainActiveCertDetails(domainId: number) {
 		const connection = await getPleskApi("192.168.1.179");
 
 		const siteInfo = (await connection.site.get({ type: "id", value: domainId }));
@@ -47,14 +47,15 @@ export default class PleskWebScraper {
 
 		const certHtml = await this.getHtml(certUrl);
 
-		const crt = certHtml.querySelector("#infoCertificate-content-area").innerText;
+		const cert = certHtml.querySelector("#infoCertificate-content-area").innerText;
 		const ca = certHtml.querySelector("#infoCaCertificate-content-area").innerText;
+		const csr = certHtml.querySelector("#infoCsr-content-area").innerText;
 
 		return {
 			name: siteInfo.data.hosting.vrt_hst.property.certificate_name,
-			csr: certHtml.querySelector("#infoCsr-content-area").innerText,
+			csr: csr === "The component is missing." ? undefined : csr,
 			pvt: certHtml.querySelector("#infoPrivateKey-content-area").innerText,
-			crt: crt === "The component is missing." ? undefined : crt,
+			cert: cert === "The component is missing." ? undefined : cert,
 			ca: ca === "The component is missing." ? undefined : ca
 		};
 	}
