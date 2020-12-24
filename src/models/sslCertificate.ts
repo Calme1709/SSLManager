@@ -1,27 +1,36 @@
-import { IOrganizationalInfo, ICertificateContent } from "@services/external/plesk/operators/certificate";
 import { prop, getModelForClass } from "@typegoose/typegoose";
+
+export interface ICertificateInstance {
+	pleskInstance: string;
+	location: {
+		type: "mail";
+	} | {
+		type: "controlPanel";
+	} | {
+		type: "domain";
+		domainName: string;
+	};
+}
+
+export interface ICertificateDetails {
+	csr?: string;
+	pvt: string;
+	cert?: string;
+	ca?: string;
+}
 
 /**
  * A connection to a remote Plesk instance.
  */
 export class SSLCertificate {
-	@prop({ unique: true })
-	public name!: string;
+	@prop()
+	public commonName?: string;
 
 	@prop()
-	public domain!: string;
+	public certificate!: ICertificateDetails;
 
 	@prop()
-	public productCode!: string;
-
-	@prop()
-	public organizationalInfo!: IOrganizationalInfo;
-
-	@prop()
-	public certificate!: ICertificateContent;
-
-	@prop()
-	public relatedWebspaces!: Array<{ pleskInstance: string; domainName: string }>;
+	public instances!: ICertificateInstance[];
 }
 
 export const SSLCertificateModel = getModelForClass(SSLCertificate);
