@@ -53,10 +53,10 @@ export default class PleskWebScraper {
 
 		return {
 			name: siteInfo.data.hosting.vrt_hst.property.certificate_name,
-			csr: csr === "The component is missing." ? undefined : csr,
+			csr: csr.replace(/\n/g, "") === "The component is missing." ? undefined : csr,
 			pvt: certHtml.querySelector("#infoPrivateKey-content-area").innerText,
-			cert: cert === "The component is missing." ? undefined : cert,
-			ca: ca === "The component is missing." ? undefined : ca
+			cert: cert.replace(/\n/g, "") === "The component is missing." ? undefined : cert,
+			ca: ca.replace(/\n/g, "") === "The component is missing." ? undefined : ca
 		};
 	}
 
