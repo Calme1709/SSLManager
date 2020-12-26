@@ -1,4 +1,4 @@
-import getPleskApi, { IPleskCredentials } from "@services/external/plesk/index";
+import getPleskApi, { IPleskCredentials } from "@services/external/plesk/";
 import { PleskConnectionModel } from "@models/pleskConnection";
 import { SSLCertificateModel, ICertificateInstance, SSLCertificate, ICertificateDetails } from "@models/sslCertificate";
 import { CertificateDecoder, Writable } from "@utils";
