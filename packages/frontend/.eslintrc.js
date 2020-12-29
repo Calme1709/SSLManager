@@ -1,0 +1,1 @@
+module.exports = require("@calme1709/front-end-config/.eslintrc");

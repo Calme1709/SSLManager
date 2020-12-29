@@ -1,0 +1,24 @@
+{
+  "name": "@calme1709/sslmanager",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "build": "lerna run build --stream",
+    "start": "lerna run start --stream",
+    "lint": "lerna run lint --stream"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Calme1709/SSLManager.git"
+  },
+  "author": "",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/Calme1709/SSLManager/issues"
+  },
+  "homepage": "https://github.com/Calme1709/SSLManager#readme",
+  "devDependencies": {
+    "lerna": "^3.22.1"
+  }
+}

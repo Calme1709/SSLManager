@@ -9,8 +9,7 @@
 	"scripts": {
 		"start": "NODE_TLS_REJECT_UNAUTHORIZED=0 NODE_ENV=staging npx back-end-config start",
 		"build": "npx back-end-config build",
-		"lint": "eslint --cache --config node_modules/@calme1709/back-end-config/.eslintrc.js --ext ts,tsx src/**/*",
-		"lint-perf": "TIMING=1 eslint --config node_modules/@calme1709/back-end-config/.eslintrc.js --ext ts,tsx src/**/*"
+		"lint": "eslint --cache --config node_modules/@calme1709/back-end-config/.eslintrc.js --ext ts,tsx src/**/*"
 	},
 	"keywords": [],
 	"author": "",

@@ -1,0 +1,32 @@
+{
+  "name": "@calme1709/sslmanager-frontend",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "start": "npx front-end-config start",
+    "build": "npx front-end-config build",
+    "lint": "eslint --cache --config node_modules/@calme1709/front-end-config/.eslintrc.js --ext ts,tsx src/**/*"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Calme1709/SSLManager.git"
+  },
+  "author": "Callum Law",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/Calme1709/SSLManager/issues"
+  },
+  "homepage": "https://github.com/Calme1709/SSLManager#readme",
+  "devDependencies": {
+    "@calme1709/front-end-config": "^2.0.6",
+    "@types/react": "^17.0.0",
+    "@types/react-dom": "^17.0.0",
+    "@types/react-router-dom": "^5.1.6"
+  },
+  "dependencies": {
+    "react": "^17.0.1",
+    "react-dom": "^17.0.1",
+    "react-router-dom": "^5.2.0"
+  }
+}
