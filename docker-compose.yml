@@ -13,7 +13,7 @@ services:
       - "8080:80"
     restart: always
   frontend:
-    image: nginx:latest
+    build: ./packages/frontend
     depends_on:
       - backend
     volumes:
@@ -21,4 +21,3 @@ services:
     ports:
       - "80:80"
     restart: always
-    

@@ -2,12 +2,12 @@ FROM node:latest
 
 WORKDIR /usr/src/app
 
-COPY package*.json ./
+COPY . .
 
-RUN npm install --only=production
+RUN npm install
 
-COPY ./dist ./
+RUN npm run build
 
 EXPOSE 80
 
-CMD [ "node", "build.js" ]
+CMD [ "node", "dist/build.js" ]
