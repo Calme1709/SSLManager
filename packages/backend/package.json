@@ -9,7 +9,7 @@
 	"scripts": {
 		"start": "NODE_TLS_REJECT_UNAUTHORIZED=0 NODE_ENV=staging npx back-end-config start",
 		"build": "npx back-end-config build",
-		"lint": "eslint --cache --config node_modules/@calme1709/back-end-config/.eslintrc.js --ext ts,tsx src/**/*"
+		"lint": "eslint --cache --config ./.eslintrc.js --ext ts,tsx src/**/*"
 	},
 	"keywords": [],
 	"author": "",
@@ -31,7 +31,7 @@
 		"@calme1709/back-end-config": "^2.0.4",
 		"@types/bcryptjs": "^2.4.2",
 		"@types/cors": "^2.8.9",
-		"@types/express": "^4.17.10",
+		"@types/express": "^4.17.11",
 		"@types/jsonwebtoken": "^8.5.0",
 		"@types/mongoose": "^5.10.3",
 		"@types/node": "^14.14.20",
