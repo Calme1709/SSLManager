@@ -4,8 +4,9 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "build": "lerna run build --stream",
-    "start": "npm run build && sudo docker-compose build && sudo docker-compose up",
+	"build": "lerna run build --stream",
+	"start:dev": "lerna run start --stream",
+    "start:prod": "docker-compose build && docker-compose up",
     "lint": "lerna run lint --stream"
   },
   "repository": {
