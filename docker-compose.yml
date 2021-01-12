@@ -12,12 +12,14 @@ services:
     ports:
       - "8080:80"
     restart: always
+    volumes:
+      - ./log/backend.log:/var/log/SSLManager.log
   frontend:
     build: ./packages/frontend
     depends_on:
       - backend
     volumes:
-      - ./packages/frontend/dist:/usr/share/nginx/html:ro
+      - ./log/:/var/log/nginx/
     ports:
       - "80:80"
     restart: always
