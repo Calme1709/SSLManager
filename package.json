@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "build": "lerna run build --stream",
-    "start": "lerna run start --stream",
+    "start": "npm run build && sudo docker-compose build && sudo docker-compose up",
     "lint": "lerna run lint --stream"
   },
   "repository": {

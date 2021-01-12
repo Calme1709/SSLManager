@@ -1,0 +1,24 @@
+version: "3"
+services: 
+  mongo:
+    image: mongo:latest
+    volumes:
+      - ./mongodata:/data/db
+    restart: always
+  backend:
+    build: ./packages/backend
+    depends_on:
+      - mongo
+    ports:
+      - "8080:80"
+    restart: always
+  frontend:
+    image: nginx:latest
+    depends_on:
+      - backend
+    volumes:
+      - ./packages/frontend/dist:/usr/share/nginx/html:ro
+    ports:
+      - "80:80"
+    restart: always
+    
