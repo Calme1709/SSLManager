@@ -13,7 +13,7 @@ services:
       - "8080:80"
     restart: always
     volumes:
-      - ./log/backend.log:/var/log/SSLManager.log
+      - ./log/:/var/log/sslmanager/
   frontend:
     build: ./packages/frontend
     depends_on:
