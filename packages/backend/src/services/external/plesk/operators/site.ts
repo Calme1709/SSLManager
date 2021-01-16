@@ -77,13 +77,13 @@ interface ISiteInfo {
 					perl?: boolean;
 					python?: boolean;
 					fastcgi?: boolean;
-					webstat?: "none" | "webalizer" | "awstats";
+					webstat?: "awstats" | "none" | "webalizer";
 					errdocs?: boolean;
 					write_modify?: boolean;
 					web_deply?: boolean;
 					webstat_protected?: boolean;
-					"waf-rule-engine"?: "on" | "off" | "detection-only";
-					"waf-rule-set"?: "tortix" | "crs";
+					"waf-rule-engine"?: "detection-only" | "off" | "on";
+					"waf-rule-set"?: "crs" | "tortix";
 					nginxServePhp?: boolean;
 					"web-server-expires"?: number;
 					"web-server-expires-static-only"?: boolean;
@@ -150,22 +150,5 @@ export default class Session extends Operator<"site"> {
 		]);
 
 		return result as ISiteInfo;
-	}
-
-	/**
-	 * Terminate an ongoing Plesk Control Panel session.
-	 *
-	 * @param sessionId - The ID of the session to terminate.
-	 *
-	 * @returns Whether or not the termination was successful.
-	 */
-	public async terminate(sessionId: string) {
-		interface IResponse {
-			status: "ok" | "error";
-		}
-
-		const result = await this.xmlApiRequest<IResponse, string>("terminate", this.createDataNode("session-id", sessionId));
-
-		return result.status === "ok";
 	}
 }
