@@ -1,5 +1,7 @@
 FROM node:latest
 
+RUN apt install openssl
+
 WORKDIR /usr/src/app
 
 COPY . .
