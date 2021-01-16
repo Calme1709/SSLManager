@@ -3,15 +3,14 @@ import { Request, NextFunction } from "express";
 import { ControlledError } from "@utils";
 
 /**
- * Create a parameter validator that ensures the incoming request has the correct parameters.
+ * Create a request validation middleware that ensures the incoming request has the correct data.
  *
  * @param schema - The Joi schema to validate against.
- * @param dataToValidate - The request data to validate (either the body (for post/put/patch requests) or the query).
  *
  * @returns An express middleware function.
  */
-export default (schema: Schema, dataToValidate: "body" | "query" = "query") => (req: Request, {}, next: NextFunction) => {
-	const result = schema.validate(req[dataToValidate]);
+export default (schema: Schema) => (req: Request, {}, next: NextFunction) => {
+	const result = schema.validate(req);
 
 	if(result.error !== undefined) {
 		next(new ControlledError(422, result.error.details[0].message.replace(/"/g, "'")));
