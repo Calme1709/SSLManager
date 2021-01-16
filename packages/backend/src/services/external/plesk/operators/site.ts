@@ -12,7 +12,7 @@ export enum SiteStatus {
 }
 
 //eslint-disable-next-line max-len
-type SiteFilterType = "id" | "parent-id" | "parent-site-id" | "name" | "parent-name" | "parent-site-name" | "guid" | "parent-guid" | "parent-site-guid";
+type SiteFilterType = "guid" | "id" | "name" | "parent-guid" | "parent-id" | "parent-name" | "parent-site-guid" | "parent-site-id" | "parent-site-name";
 
 type SiteFilter = IFilter<SiteFilterType, { id: number; "parent-id": number; "parent-side-id": number }>;
 
@@ -28,7 +28,7 @@ interface ISiteInfo {
 			status: SiteStatus;
 			real_size: number;
 			dns_ip_address?: string;
-			htype: "vrt_hst" | "std_fwd" | "frm_fwd";
+			htype: "frm_fwd" | "std_fwd" | "vrt_hst";
 			guid: string;
 			"webspace-guid": string;
 			"sb-site-uuid"?: string;
@@ -43,7 +43,7 @@ interface ISiteInfo {
 					ssl?: boolean;
 					"ssl-redirect"?: boolean;
 					iis_app_ppol?: boolean;
-					php_handler_id?: "module" | "cgi" | "fastcgi" | "cgi-5" | "cgi-5.3" | "cgi-5.4" | "fastcgi-5" | "fastcgi-5.3" | "fastcgi-5.4" | "isapi-5";
+					php_handler_id?: "cgi-5.3" | "cgi-5.4" | "cgi-5" | "cgi" | "fastcgi-5.3" | "fastcgi-5.4" | "fastcgi-5" | "fastcgi" | "isapi-5" | "module";
 					ssi_html?: boolean;
 					managed_runtime_version?: string;
 					www_root?: string;

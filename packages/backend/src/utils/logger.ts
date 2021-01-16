@@ -29,7 +29,7 @@ export default class Logger {
 	 * @param message - The message to write.
 	 * @param logType - The type of logging this is (error, warning, normal).
 	 */
-	public static log(message: string, logType: "ERROR" | "WARN" | "NORMAL" = "NORMAL") {
+	public static log(message: string, logType: "ERROR" | "NORMAL" | "WARN" = "NORMAL") {
 		if(process.env.NODE_ENV === "staging") {
 			switch (logType) {
 				case "NORMAL":

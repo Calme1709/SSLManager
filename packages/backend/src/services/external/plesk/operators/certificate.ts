@@ -139,19 +139,19 @@ export default class Certificate extends Operator<"certificate"> {
 	 * @returns A list of certificates.
 	 */
 	//eslint-disable-next-line @typescript-eslint/naming-convention
-	public async get_pool(filter?: IFilter<"domain-id" | "domain-name" | "domain-guid">) {
+	public async get_pool(filter?: IFilter<"domain-guid" | "domain-id" | "domain-name">) {
 		interface IResponse {
 			certificates: {
-				certificate: { name: string } | Array<{ name: string }>
+				certificate: Array<{ name: string }> | { name: string };
 			};
 		}
 
 		const result = (await this.xmlApiRequest<IResponse, string>(
 			"get-pool",
 			[
-				filter === undefined ?
-					this.createDataNode("admin", "") :
-					this.createDataNode(
+				filter === undefined
+					? this.createDataNode("admin", "")
+					: this.createDataNode(
 						"filter",
 						[ this.createOptionalDataNode(filter.type, filter.value.toString()) ]
 					)

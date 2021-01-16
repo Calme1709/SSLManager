@@ -28,7 +28,7 @@ interface IGetResponse {
 			id: number;
 			name: string;
 			"ascii-name": string;
-			type: "domain" | "alias" | "subdomain";
+			type: "alias" | "domain" | "subdomain";
 			main: boolean;
 			guid: string;
 			"external-id": string;

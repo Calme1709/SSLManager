@@ -54,7 +54,7 @@ export default class CertificateDecoder {
 			CN: "commonName"
 		};
 
-		type IssuerInfo = Record<"commonName" | "organization" | "organizationDepartment" | "country", string>;
+		type IssuerInfo = Record<"commonName" | "country" | "organization" | "organizationDepartment", string>;
 
 		const issuerNameMap: Record<string, keyof IssuerInfo> = {
 			CN: "commonName",

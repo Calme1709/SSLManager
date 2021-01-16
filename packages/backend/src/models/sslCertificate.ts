@@ -3,12 +3,12 @@ import { prop, getModelForClass } from "@typegoose/typegoose";
 export interface ICertificateInstance {
 	pleskInstance: string;
 	location: {
-		type: "mail";
-	} | {
 		type: "controlPanel";
 	} | {
 		type: "domain";
 		domainName: string;
+	} | {
+		type: "mail";
 	};
 }
 

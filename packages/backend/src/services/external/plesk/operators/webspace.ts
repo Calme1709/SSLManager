@@ -2,7 +2,7 @@ import Operator from "./base";
 import { IFilter } from ".";
 import { PleskApi } from "..";
 
-type DomainFilterType = IFilter<"id" | "owner-id" | "name" | "owner-login" | "guid" | "owner-guid" | "external-id" | "owner-external-id">;
+type DomainFilterType = IFilter<"external-id" | "guid" | "id" | "name" | "owner-external-id" | "owner-guid" | "owner-id" | "owner-login">;
 
 /**
  * The operator for managing webspaces in plesk.

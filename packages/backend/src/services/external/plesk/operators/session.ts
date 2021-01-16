@@ -31,7 +31,7 @@ export default class Session extends Operator<"session"> {
 		}
 
 		interface IResponse {
-			session: ISessionInfo | Array<ISessionInfo | undefined>;
+			session: Array<ISessionInfo | undefined> | ISessionInfo;
 		}
 
 		const result = await this.xmlApiRequest<IResponse, string>("get", "");
@@ -48,7 +48,7 @@ export default class Session extends Operator<"session"> {
 	 */
 	public async terminate(sessionId: string) {
 		interface IResponse {
-			status: "ok" | "error";
+			status: "error" | "ok";
 		}
 
 		const result = await this.xmlApiRequest<IResponse, string>("terminate", this.createDataNode("session-id", sessionId));

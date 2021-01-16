@@ -58,15 +58,15 @@ export default class Operator<OperatorName extends string> {
 	 */
 	protected xmlApiRequest<ResponseType, OperationName extends string>(
 		operation: OperationName,
-		dataNodes: string | string[] | undefined,
+		dataNodes: string[] | string | undefined,
 		verboseErrors = false
 	) {
 		return new Promise<ResponseType>((resolve, reject) => {
 			const requestBody = `<?xml version="1.0" encoding="utf-8"?>${this.generatePacket(operation, dataNodes)}`;
 
-			const authHeaders = this.pleskApi.apiKey === undefined ?
-				{ HTTP_AUTH_LOGIN: (this.pleskApi.credentials!).login, HTTP_AUTH_PASSWD: (this.pleskApi.credentials!).password } :
-				{ KEY: this.pleskApi.apiKey };
+			const authHeaders = this.pleskApi.apiKey === undefined
+				? { HTTP_AUTH_LOGIN: (this.pleskApi.credentials!).login, HTTP_AUTH_PASSWD: (this.pleskApi.credentials!).password }
+				: { KEY: this.pleskApi.apiKey };
 
 			const req = https.request({
 				method: "POST",
@@ -114,7 +114,7 @@ export default class Operator<OperatorName extends string> {
 	 *
 	 * @returns The generated node or empty string.
 	 */
-	protected createOptionalDataNode(node: string, nodeData?: string | Array<string | undefined>) {
+	protected createOptionalDataNode(node: string, nodeData?: Array<string | undefined> | string) {
 		if(nodeData !== undefined && nodeData !== "") {
 			return this.createDataNode(node, nodeData as string);
 		}
@@ -134,7 +134,7 @@ export default class Operator<OperatorName extends string> {
 	 *
 	 * @returns The generated node.
 	 */
-	protected createDataNode(node: string, nodeData: string | string[]) {
+	protected createDataNode(node: string, nodeData: string[] | string) {
 		if(typeof nodeData === "string") {
 			return `
 				<${node}>${nodeData}</${node}>
@@ -154,7 +154,7 @@ export default class Operator<OperatorName extends string> {
 	 *
 	 * @returns The XML packet to send to the server.
 	 */
-	private generatePacket(operation: string, dataNodes?: string | string[]) {
+	private generatePacket(operation: string, dataNodes?: string[] | string) {
 		let dataNodeString: string;
 
 		switch (typeof dataNodes) {
