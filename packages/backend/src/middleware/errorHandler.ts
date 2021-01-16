@@ -16,5 +16,8 @@ export default (err: ControlledError | Error, {}, res: Response, {}) => {
 
 	const error = isControlledError ? err as ControlledError : new ControlledError(500, "Internal server error");
 
-	res.status(error.httpCode).send(error.reason);
+	res.status(error.httpCode).json({
+		success: false,
+		error: error.reason
+	});
 };
