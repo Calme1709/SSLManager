@@ -7,10 +7,18 @@ import AuthenticationService from "@services/authentication";
  * @param req - The request to authenticate.
  * @param next - The express next function.
  */
-export default async (req: Request, {}, next: NextFunction) => {
+export default (req: Request, {}, next: NextFunction) => {
 	const authenticationToken = req.headers.authenticationtoken;
 
 	AuthenticationService.validateToken(authenticationToken as string | undefined)
-		.then(() => next())
+		.then(validationResult => {
+			if(validationResult.isValid) {
+				next();
+
+				return;
+			}
+
+			next(validationResult.error);
+		})
 		.catch(err => next(err));
 };

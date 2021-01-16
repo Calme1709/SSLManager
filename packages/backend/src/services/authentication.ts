@@ -53,21 +53,36 @@ export default class AuthenticationService {
 	}
 
 	/**
-	 * Check if a passed value is a valid authentication token, throws if it is not.
+	 * Check if a passed value is a valid authentication token.
 	 *
 	 * @param authenticationToken - The value to check.
+	 *
+	 * @returns Whether the token is valid, and the reason if it is not.
 	 */
 	public static async validateToken(authenticationToken: any) {
 		if(typeof authenticationToken !== "string") {
-			throw new ControlledError(403, "No authentication token provided");
+			return {
+				isValid: false,
+				error: new ControlledError(403, "No authentication token provided")
+			};
 		}
 
 		if(!JsonWebTokens.isValid(authenticationToken, jwtSecret)) {
-			throw new ControlledError(403, "Invalid authentication token provided");
+			return {
+				isValid: false,
+				error: new ControlledError(403, "Invalid authentication token provided")
+			};
 		}
 
 		if(!(await UserModel.exists({ username: JsonWebTokens.decode<{ username: string }>(authenticationToken).username }))) {
-			throw new ControlledError(404, "User does not exist");
+			return {
+				isValid: false,
+				error: new ControlledError(404, "User does not exist")
+			};
 		}
+
+		return {
+			isValid: true
+		};
 	}
 }
