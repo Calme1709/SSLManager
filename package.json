@@ -7,7 +7,7 @@
 	"build": "lerna run build --stream",
 	"start:dev": "lerna run start --stream",
     "start:prod": "docker-compose build && docker-compose up",
-    "lint": "lerna run lint --stream"
+    "lint": "cd packages/backend && npm run lint && cd ../frontend && npm run lint"
   },
   "repository": {
     "type": "git",
