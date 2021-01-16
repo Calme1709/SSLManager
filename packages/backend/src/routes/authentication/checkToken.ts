@@ -1,10 +1,8 @@
-import { requestValidator } from "@middleware";
 import Joi from "joi";
-import { Handler } from "../handler";
 import AuthenticationService from "@services/authentication";
-import { ControlledError } from "@utils";
+import { Handler, MethodsDefinition } from "@utils/router";
 
-const schema = Joi.object({
+const postSchema = Joi.object({
 	authenticationToken: Joi.string().required()
 });
 
@@ -12,31 +10,28 @@ interface ICheckTokenRequestBody {
 	authenticationToken: string;
 }
 
-type CheckTokenHandler = Handler<ICheckTokenRequestBody, Record<string, string>, { isValid: boolean }>;
+type PostHandler = Handler<ICheckTokenRequestBody, undefined, { isValid: boolean } | { isValid: boolean; reason: string }>;
 
 /**
- * The express request handler for the login path.
+ * Check if the passed authentication token is valid.
  *
- * @param request - The express request object.
- * @param response - The express response object.
- * @param next - The express next function.
+ * @param data - The data passed with the HTTP request.
+ *
+ * @returns Whether the token is valid, and the reason if it is not.
  */
-const checkTokenHandler: CheckTokenHandler = async (request, response, next) => {
-	const { authenticationToken } = request.body;
+const postHandler: PostHandler = async data => {
+	const result = await AuthenticationService.validateToken(data.body.authenticationToken);
 
-	AuthenticationService.validateToken(authenticationToken)
-		.then(() => response.status(200).json({ isValid: true }))
-		.catch(err => {
-			if(!(err instanceof ControlledError)) {
-				next(err);
-
-				return;
-			}
-
-			response.status(200).json({ isValid: false });
-		});
+	return {
+		isValid: result.isValid,
+		reason: result.error?.reason
+	};
 };
 
-export default {
-	post: [ requestValidator(schema, "body"), checkTokenHandler ]
-};
+export default new MethodsDefinition({
+	post: {
+		restricted: true,
+		handler: postHandler,
+		validation: postSchema
+	}
+});

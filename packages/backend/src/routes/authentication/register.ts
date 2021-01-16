@@ -1,12 +1,6 @@
-import { requestValidator } from "@middleware";
 import Joi from "joi";
-import { Handler } from "../handler";
 import AuthenticationService from "@services/authentication";
-
-const schema = Joi.object({
-	username: Joi.string().required(),
-	password: Joi.string().required()
-});
+import { MethodsDefinition, Handler } from "@utils/router";
 
 interface IRegisterRequestBody {
 	username: string;
@@ -16,20 +10,27 @@ interface IRegisterRequestBody {
 type RegisterHandler = Handler<IRegisterRequestBody, Record<string, string>, { authenticationToken: string }>;
 
 /**
- * The express request handler for the register path.
+ * Register a user and generate a new authentication token.
  *
- * @param request - The express request object.
- * @param response - The express response object.
- * @param next - The express next function.
+ * @param data - The data passed with the HTTP request.
+ *
+ * @returns The generated authentication token.
  */
-const registerHandler: RegisterHandler = async (request, response, next) => {
-	const { username, password } = request.body;
+const register: RegisterHandler = async data => {
+	const authenticationToken = await AuthenticationService.register(data.body.username, data.body.password);
 
-	AuthenticationService.register(username, password)
-		.then(authenticationToken => response.status(200).json({ authenticationToken }))
-		.catch(err => next(err));
+	return { authenticationToken };
 };
 
-export default {
-	post: [ requestValidator(schema, "body"), registerHandler ]
-};
+export default new MethodsDefinition({
+	post: {
+		restricted: false,
+		handler: register,
+		validation: Joi.object({
+			body: Joi.object({
+				username: Joi.string().required(),
+				password: Joi.string().required()
+			})
+		})
+	}
+});

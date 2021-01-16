@@ -1,11 +1,11 @@
-import { Router as expressRouter } from "express";
-
 import authentication from "./authentication";
 import options from "./options";
 
-const router = expressRouter();
+import createRouter, { SubRoutesDefinition } from "@utils/router";
 
-router.use("/authentication", authentication);
-router.use("/options", options);
+const routes = new SubRoutesDefinition({
+	authentication,
+	options
+});
 
-export default router;
+export default createRouter(routes);

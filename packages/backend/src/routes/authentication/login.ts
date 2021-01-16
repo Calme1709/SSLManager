@@ -1,12 +1,6 @@
-import { requestValidator } from "@middleware";
 import Joi from "joi";
-import { Handler } from "../handler";
 import AuthenticationService from "@services/authentication";
-
-const schema = Joi.object({
-	username: Joi.string().required(),
-	password: Joi.string().required()
-});
+import { Handler, MethodsDefinition } from "@utils/router";
 
 interface ILoginRequestBody {
 	username: string;
@@ -16,20 +10,27 @@ interface ILoginRequestBody {
 type LoginHandler = Handler<ILoginRequestBody, Record<string, string>, { authenticationToken: string }>;
 
 /**
- * The express request handler for the login path.
+ * Log a user in and generate an authentication token to be used for future requests by this user.
  *
- * @param request - The express request object.
- * @param response - The express response object.
- * @param next - The express next function.
+ * @param data - The data passed with the HTTP request.
+ *
+ * @returns The authentication token.
  */
-const loginHandler: LoginHandler = async (request, response, next) => {
-	const { username, password } = request.body;
+const postHandler: LoginHandler = async data => {
+	const authenticationToken = await AuthenticationService.login(data.body.username, data.body.password);
 
-	AuthenticationService.login(username, password)
-		.then(authenticationToken => response.status(200).json({ authenticationToken }))
-		.catch(err => next(err));
+	return { authenticationToken };
 };
 
-export default {
-	post: [ requestValidator(schema, "body"), loginHandler ]
-};
+export default new MethodsDefinition({
+	post: {
+		handler: postHandler,
+		restricted: false,
+		validation: Joi.object({
+			body: Joi.object({
+				username: Joi.string().required(),
+				password: Joi.string().required()
+			})
+		})
+	}
+});
