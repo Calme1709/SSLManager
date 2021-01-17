@@ -76,8 +76,8 @@ export default class PleskWebScraper {
 			} else {
 				const connection = await getPleskApi(this.ipAddress);
 
-				const session = (await connection.session.get()).find(sess => sess !== undefined && sess.id === sessionInfo.cookie);
 				const idleTime = (await connection.server.get()).session_setup.login_timeout * 60 * 1000;
+				const session = (await connection.session.get()).find(sess => sess.id === sessionInfo.cookie);
 
 				if(session === undefined) {
 					//Generate a new session.

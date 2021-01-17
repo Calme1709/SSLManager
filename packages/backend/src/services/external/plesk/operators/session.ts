@@ -31,12 +31,16 @@ export default class Session extends Operator<"session"> {
 		}
 
 		interface IResponse {
-			session: Array<ISessionInfo | undefined> | ISessionInfo;
+			session: ISessionInfo | ISessionInfo[] | undefined;
 		}
 
-		const result = await this.xmlApiRequest<IResponse, string>("get", "");
+		const { session } = await this.xmlApiRequest<IResponse, string>("get", "");
 
-		return Array.isArray(result.session) ? result.session : [ result.session ];
+		if(session === undefined) {
+			return [];
+		}
+
+		return Array.isArray(session) ? session : [ session ];
 	}
 
 	/**
