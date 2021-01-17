@@ -10,7 +10,7 @@ const main = async () => {
 	//eslint-disable-next-line @typescript-eslint/naming-convention
 	const openSSLVersion = execSync("openssl version").toString("utf-8");
 
-	if(!/OpenSSL \d+\.\d+\.\d+[a-z]+.+$/g.exec(openSSLVersion)) {
+	if(!/OpenSSL \d+\.\d+\.\d+[a-z]+.+/g.test(openSSLVersion)) {
 		throw new Error("OpenSSL not installed");
 	}
 
