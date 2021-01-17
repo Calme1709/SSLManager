@@ -125,35 +125,16 @@ export class PleskApi {
 			return this.operatorCache[operatorName];
 		}
 
-		let operator: Operator<string> | undefined;
+		const operators = {
+			secret_key: SecretKey,
+			certificate: Certificate,
+			server: Server,
+			webspace: Webspace,
+			session: Session,
+			site: Site
+		};
 
-		switch (operatorName) {
-			case "secret_key":
-				operator = new SecretKey(this);
-				break;
-
-			case "certificate":
-				operator = new Certificate(this);
-				break;
-
-			case "server":
-				operator = new Server(this);
-				break;
-
-			case "webspace":
-				operator = new Webspace(this);
-				break;
-
-			case "session":
-				operator = new Session(this);
-				break;
-
-			case "site":
-				operator = new Site(this);
-				break;
-			default:
-				break;
-		}
+		const operator = new operators[operatorName](this);
 
 		this.operatorCache[operatorName] = operator;
 
