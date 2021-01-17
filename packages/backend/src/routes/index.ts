@@ -1,11 +1,9 @@
 import authentication from "./authentication";
 import options from "./options";
 
-import createRouter, { SubRoutesDefinition } from "@utils/router";
+import Router from "@utils/router";
 
-const routes = new SubRoutesDefinition({
+export default new Router({
 	authentication,
 	options
 });
-
-export default createRouter(routes);
