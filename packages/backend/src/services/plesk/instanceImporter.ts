@@ -59,7 +59,7 @@ export default class PleskInstanceImporter {
 			const cert = await webScraper.getDomainActiveCertDetails(domain.id);
 
 			if(cert === undefined) {
-				return;
+				continue;
 			}
 
 			const { name: {}, ...certDetails } = cert;
@@ -119,16 +119,10 @@ export default class PleskInstanceImporter {
 			$push: { instances: instance }
 		};
 
-		if(certDetails.csr !== undefined && existingEntry.certificate.csr === undefined) {
-			updateQuery["certificate.csr"] = certDetails.csr;
-		}
-
-		if(certDetails.cert !== undefined && existingEntry.certificate.cert === undefined) {
-			updateQuery["certificate.cert"] = certDetails.cert;
-		}
-
-		if(certDetails.ca !== undefined && existingEntry.certificate.ca === undefined) {
-			updateQuery["certificate.ca"] = certDetails.cert;
+		for(const component of [ "csr", "cert", "ca" ] as [ "csr", "cert", "ca" ]) {
+			if(certDetails[component] !== undefined && existingEntry.certificate[component] === undefined) {
+				updateQuery[`certificate.${component}`] = certDetails[component];
+			}
 		}
 
 		if(existingEntry.commonName === undefined) {
