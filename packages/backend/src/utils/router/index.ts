@@ -30,7 +30,7 @@ export default class Router {
 			if(definition instanceof MethodsDefinition) {
 				definition.applyMethodsToRouter(expressRouter, path);
 			} else {
-				expressRouter.use(path, definition.generateExpressRouter());
+				expressRouter.use(`/${path}`, definition.generateExpressRouter());
 			}
 		}
 
