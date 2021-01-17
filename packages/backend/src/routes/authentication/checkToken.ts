@@ -2,15 +2,11 @@ import Joi from "joi";
 import AuthenticationService from "@services/authentication";
 import { Handler, MethodsDefinition } from "@utils/router";
 
-const postSchema = Joi.object({
-	authenticationToken: Joi.string().required()
-});
-
-interface ICheckTokenRequestBody {
+interface IPostBody {
 	authenticationToken: string;
 }
 
-type PostHandler = Handler<ICheckTokenRequestBody, undefined, { isValid: boolean } | { isValid: boolean; reason: string }>;
+type PostResponse = { isValid: boolean } | { isValid: boolean; reason: string };
 
 /**
  * Check if the passed authentication token is valid.
@@ -19,12 +15,18 @@ type PostHandler = Handler<ICheckTokenRequestBody, undefined, { isValid: boolean
  *
  * @returns Whether the token is valid, and the reason if it is not.
  */
-const postHandler: PostHandler = async data => {
+const postHandler: Handler<IPostBody, undefined, PostResponse> = async data => {
 	const result = await AuthenticationService.validateToken(data.body.authenticationToken);
 
+	if(result.isValid) {
+		return {
+			isValid: true
+		};
+	}
+
 	return {
-		isValid: result.isValid,
-		reason: result.error?.reason
+		isValid: false,
+		reason: result.error.reason
 	};
 };
 
@@ -32,6 +34,10 @@ export default new MethodsDefinition({
 	post: {
 		restricted: true,
 		handler: postHandler,
-		validation: postSchema
+		validation: Joi.object({
+			body: Joi.object({
+				authenticationToken: Joi.string().required()
+			})
+		})
 	}
 });

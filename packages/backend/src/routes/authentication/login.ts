@@ -2,12 +2,14 @@ import Joi from "joi";
 import AuthenticationService from "@services/authentication";
 import { Handler, MethodsDefinition } from "@utils/router";
 
-interface ILoginRequestBody {
+interface IPostBody {
 	username: string;
 	password: string;
 }
 
-type LoginHandler = Handler<ILoginRequestBody, Record<string, string>, { authenticationToken: string }>;
+interface IPostResponse {
+	token: string;
+}
 
 /**
  * Log a user in and generate an authentication token to be used for future requests by this user.
@@ -16,11 +18,9 @@ type LoginHandler = Handler<ILoginRequestBody, Record<string, string>, { authent
  *
  * @returns The authentication token.
  */
-const postHandler: LoginHandler = async data => {
-	const authenticationToken = await AuthenticationService.login(data.body.username, data.body.password);
-
-	return { authenticationToken };
-};
+const postHandler: Handler<IPostBody, undefined, IPostResponse> = async data => ({
+	token: await AuthenticationService.login(data.body.username, data.body.password)
+});
 
 export default new MethodsDefinition({
 	post: {

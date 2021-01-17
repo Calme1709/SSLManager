@@ -2,12 +2,14 @@ import Joi from "joi";
 import AuthenticationService from "@services/authentication";
 import { MethodsDefinition, Handler } from "@utils/router";
 
-interface IRegisterRequestBody {
+interface IPostBody {
 	username: string;
 	password: string;
 }
 
-type RegisterHandler = Handler<IRegisterRequestBody, Record<string, string>, { authenticationToken: string }>;
+interface IPostResponse {
+	token: string;
+}
 
 /**
  * Register a user and generate a new authentication token.
@@ -16,11 +18,9 @@ type RegisterHandler = Handler<IRegisterRequestBody, Record<string, string>, { a
  *
  * @returns The generated authentication token.
  */
-const register: RegisterHandler = async data => {
-	const authenticationToken = await AuthenticationService.register(data.body.username, data.body.password);
-
-	return { authenticationToken };
-};
+const register: Handler<IPostBody, undefined, IPostResponse> = async data => ({
+	token: await AuthenticationService.register(data.body.username, data.body.password)
+});
 
 export default new MethodsDefinition({
 	post: {
