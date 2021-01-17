@@ -59,7 +59,7 @@ export default class AuthenticationService {
 	 *
 	 * @returns Whether the token is valid, and the reason if it is not.
 	 */
-	public static async validateToken(authenticationToken: any) {
+	public static async validateToken(authenticationToken: any): Promise<{ isValid: false; error: ControlledError } | { isValid: true }> {
 		if(typeof authenticationToken !== "string") {
 			return {
 				isValid: false,
