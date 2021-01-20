@@ -1,6 +1,6 @@
 import Operator from "./base";
 import { PleskApi } from "..";
-import { IFilter } from "./index";
+import { IFilter } from ".";
 
 export enum SiteStatus {
 	Active = 0,
