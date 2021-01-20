@@ -1,6 +1,6 @@
 /*eslint-disable @typescript-eslint/no-explicit-any*/
 import { Router, RequestHandler } from "express";
-import { Schema } from "joi";
+import { ObjectSchema } from "joi";
 import ControlledError from "../controlledError";
 import AuthenticationService from "../../services/authentication";
 
@@ -19,7 +19,7 @@ export type Handler<
 export interface IRequestHandler {
 	handler: Handler;
 	restricted: boolean;
-	validation?: Schema;
+	validation?: ObjectSchema;
 }
 
 export type Method = "delete" | "get" | "head" | "options" | "patch" | "post" | "put" | "trace";
@@ -78,10 +78,10 @@ export default class MethodsDefinition {
 			}
 
 			if(handler.validation !== undefined) {
-				const result = handler.validation.validate(request);
+				const result = handler.validation.unknown(true).validate(request);
 
 				if(result.error !== undefined) {
-					next(new ControlledError(422, result.error.details[0].message.replace(/"/g, "'")));
+					next(new ControlledError(422, `Request Validation: ${result.error.details[0].message.replace(/"/g, "'")}`));
 
 					return;
 				}
