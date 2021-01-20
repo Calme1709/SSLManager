@@ -2,7 +2,7 @@ import { OptionModel } from "@models/options";
 import { Handler } from "@utils/router";
 
 /**
- * The request handler for the post method.
+ * Get all of the options currently set on the server.
  *
  * @returns The values of all currently set options.
  */

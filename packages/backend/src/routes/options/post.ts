@@ -9,7 +9,7 @@ interface IBody {
 }
 
 /**
- * The express request handler for the post method.
+ * Set options on the server.
  *
  * @param data - The data passed with the HTTP request.
  * @param data.body - The HTTP body passed with the request.
