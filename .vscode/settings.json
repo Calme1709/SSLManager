@@ -3,6 +3,9 @@
 	"editor.tabSize": 4,
     "editor.detectIndentation": false,
 	"tsimporter.doubleQuotes": true,
+	"scss.validate": true,
+	"stylelint.enable": true,
+	"stylelint.configFile": "${workspaceFolder}/packages/frontend/node_modules/@calme1709/front-end-config/.stylelintrc",
 	"eslint.workingDirectories": [
 		{ "directory": "packages/backend", "!cwd": false },
 		{ "directory": "packages/frontend", "!cwd": false }
