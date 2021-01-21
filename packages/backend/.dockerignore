@@ -3,4 +3,5 @@ LICENSE
 .eslintcache
 .eslintrc.js
 Dockerfile
+.dockerignore
 dist
