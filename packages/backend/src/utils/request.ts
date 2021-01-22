@@ -26,14 +26,16 @@ export default (protocol: "http" | "https", requestOptions: RequestOptions | URL
 			response.on("error", err => {
 				reject(err);
 			});
+
+			response.on("end", () => {
+				resolve(data);
+			});
 		});
 
 		req.on("error", err => {
 			reject(err);
 		});
 
-		req.on("finish", () => {
-			resolve(data);
-		});
+		req.end();
 	});
 };
