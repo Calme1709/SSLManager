@@ -3,7 +3,8 @@
 		"target": "ES5",
 		"module": "CommonJS",
 		"lib": [
-			"ESNext"
+			"ESNext",
+			"DOM"
         ],
 		"removeComments": true,
 		"downlevelIteration": true,
