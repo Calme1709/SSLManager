@@ -23,7 +23,6 @@
 		"jsonwebtoken": "^8.5.1",
 		"mongoose": "^5.10.18",
 		"node-html-parser": "^2.0.2",
-		"public-ip": "^4.0.3",
 		"puppeteer": "^5.5.0",
 		"xml2json": "^0.12.0"
 	},

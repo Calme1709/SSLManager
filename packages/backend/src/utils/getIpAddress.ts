@@ -1,5 +1,6 @@
 import os from "os";
-import publicIp from "public-ip";
+import request from "./request";
+
 
 /**
  * Get the machines IP address, relative to a remote machine.
@@ -22,5 +23,5 @@ export default async (relativeTo?: string) => {
 			.filter(inter => inter.family === "IPv4" && !inter.internal))[0].address;
 	}
 
-	return await publicIp.v4();
+	return await request("https", "bot.whatismyipaddress.com/");
 };
