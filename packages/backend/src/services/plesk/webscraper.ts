@@ -31,7 +31,7 @@ export default class PleskWebScraper {
 	 * @returns The information about the domains SSL certificate.
 	 */
 	public async getDomainActiveCertDetails(domainId: number) {
-		const connection = await getPleskApi("192.168.1.179");
+		const connection = await getPleskApi(this.ipAddress);
 
 		const siteInfo = (await connection.site.get({ type: "id", value: domainId }));
 
