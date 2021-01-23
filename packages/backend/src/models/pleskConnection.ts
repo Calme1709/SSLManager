@@ -5,7 +5,7 @@ import { prop, getModelForClass } from "@typegoose/typegoose";
  */
 export class PleskConnection {
 	@prop({ unique: true })
-	public ipAddress!: string;
+	public hostname!: string;
 
 	@prop()
 	public friendlyName!: string;

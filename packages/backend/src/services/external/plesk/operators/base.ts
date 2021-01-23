@@ -70,7 +70,7 @@ export default class Operator<OperatorName extends string> {
 
 			const req = https.request({
 				method: "POST",
-				host: this.pleskApi.ipAddress,
+				host: this.pleskApi.hostname,
 				port: 8443,
 				path: "/enterprise/control/agent.php",
 				headers: { "Content-Type": "text/xml", "Content-Length": Buffer.byteLength(requestBody), ...authHeaders }

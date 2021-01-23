@@ -11,15 +11,15 @@ export default class PleskService {
 	 * Add and initialize a new Plesk instance.
 	 *
 	 * @param friendlyName - The friendly name of this server, will be used in most situations that is user facing instead of the hostname.
-	 * @param ipAddress - The IP of the remote Plesk instance that is being added.
+	 * @param hostname - The hostname of the remote Plesk instance that is being added.
 	 * @param credentials - The credentials that are used to log in to the new remote Plesk instance.
 	 * @param useHttps - Whether to use HTTPS instead of HTTP when accessing the server.
 	 */
-	public static async addPleskInstance(friendlyName: string, ipAddress: string, credentials: IPleskCredentials, useHttps: boolean) {
-		if(await PleskConnectionModel.exists({ ipAddress })) {
+	public static async addPleskInstance(friendlyName: string, hostname: string, credentials: IPleskCredentials, useHttps: boolean) {
+		if(await PleskConnectionModel.exists({ hostname })) {
 			throw new ControlledError(409, "Plesk instance already linked");
 		}
 
-		await PleskInstanceImporter.import(friendlyName, ipAddress, credentials, useHttps);
+		await PleskInstanceImporter.import(friendlyName, hostname, credentials, useHttps);
 	}
 }

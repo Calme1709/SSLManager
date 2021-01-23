@@ -16,21 +16,24 @@ export default class PleskInstanceImporter {
 	 * Add an initialize a new Plesk instance.
 	 *
 	 * @param friendlyName - The friendly name of this server, will be used in most situations that is user facing instead of the hostname.
-	 * @param ipAddress - The IP of the remote Plesk instance that is being added.
+	 * @param hostname - The hostname of the remote Plesk instance that is being added.
 	 * @param credentials - The credentials that are used to log in to the new remote Plesk instance.
 	 * @param useHttps - Whether to use HTTPS instead of HTTP when accessing the server.
 	 */
-	public static async import(friendlyName: string, ipAddress: string, credentials: IPleskCredentials, useHttps: boolean) {
-		const connection = await getPleskApi(ipAddress, credentials);
+	public static async import(friendlyName: string, hostname: string, credentials: IPleskCredentials, useHttps: boolean) {
+		const connection = await getPleskApi(hostname, credentials);
+
+		//Check for already existing API key.
 
 		const apiKeyDescription = "API Key that is used by the SSLManager program for any interaction it has with this Plesk instance";
 
 		const apiKey = await connection.secret_key.create(undefined, apiKeyDescription);
 
+		//TODO: Check login before saving to database
 		await PleskConnectionModel.create({
 			friendlyName,
 			login: credentials.login,
-			ipAddress,
+			hostname,
 			apiKey,
 			useHttps,
 			sessionInfo: {
@@ -39,7 +42,7 @@ export default class PleskInstanceImporter {
 			}
 		});
 
-		await this.fetchDomainCertificates(ipAddress);
+		await this.fetchDomainCertificates(hostname);
 
 		//TODO: Import plesk control panel and mail certificate aswell.
 	}
@@ -47,14 +50,15 @@ export default class PleskInstanceImporter {
 	/**
 	 * Fetch the SSL certificates that are present on the remote Plesk instance and save them to the database.
 	 *
-	 * @param ip - The IP address of the remote plesk instance.
+	 * @param hostname - The hostname address of the remote plesk instance.
 	 */
-	private static async fetchDomainCertificates(ip: string) {
-		const connection = await getPleskApi(ip);
-		const webScraper = new PleskWebScraper(ip);
+	private static async fetchDomainCertificates(hostname: string) {
+		const connection = await getPleskApi(hostname);
+		const webScraper = new PleskWebScraper(hostname);
 
 		const domains = (await connection.server.get())["admin-domain-list"].domain.filter(({ type }) => type !== "alias");
 
+		//TODO: Do this in parallel
 		for await (const domain of domains) {
 			const cert = await webScraper.getDomainActiveCertDetails(domain.id);
 
@@ -74,7 +78,7 @@ export default class PleskInstanceImporter {
 			});
 
 			const instance: ICertificateInstance = {
-				pleskInstance: ip,
+				pleskInstance: hostname,
 				location: { type: "domain", domainName: domain.name	}
 			};
 

@@ -8,7 +8,7 @@ import { getIpAddress, getPuppeteerBrowser } from "@utils";
  * Plesk not exposed through the XML RPC API.
  */
 export default class PleskWebScraper {
-	private readonly ipAddress: string;
+	private readonly hostname: string;
 
 	private sessionInfo: { cookie: string; expiration: number } = { cookie: "", expiration: 0 };
 
@@ -17,10 +17,10 @@ export default class PleskWebScraper {
 	/**
 	 * Plesk web-scraper, this is useful for .
 	 *
-	 * @param ipAddress - The IP address of the remote Plesk instance.
+	 * @param hostname - The hostname of the remote Plesk instance.
 	 */
-	public constructor(ipAddress: string) {
-		this.ipAddress = ipAddress;
+	public constructor(hostname: string) {
+		this.hostname = hostname;
 	}
 
 	/**
@@ -31,7 +31,7 @@ export default class PleskWebScraper {
 	 * @returns The information about the domains SSL certificate.
 	 */
 	public async getDomainActiveCertDetails(domainId: number) {
-		const connection = await getPleskApi(this.ipAddress);
+		const connection = await getPleskApi(this.hostname);
 
 		const siteInfo = (await connection.site.get({ type: "id", value: domainId }));
 
@@ -39,14 +39,26 @@ export default class PleskWebScraper {
 			return undefined;
 		}
 
-		const listHtml = await this.getHtml(`/smb/ssl-certificate/list/id/${domainId}`);
+		//TODO: Clean this up, possibly cache master list?
+		let certUrl = "";
 
-		const certUrl = listHtml.querySelectorAll("#ssl-certificate-list-table tbody tr td a")
-			.find(({ classNames, innerText }) => classNames.length === 0 && innerText === siteInfo.data.hosting.vrt_hst.property.certificate_name)!
-			.getAttribute("href")!;
+		const certLink = (await this.getHtml(`/smb/ssl-certificate/list/id/${domainId}`))
+			.querySelectorAll("#ssl-certificate-list-table tbody tr td a")
+			.find(({ classNames, innerText }) => classNames.length === 0 && innerText === siteInfo.data.hosting.vrt_hst.property.certificate_name);
+
+		if(certLink === undefined) {
+			//Certificate is in master repo
+			certUrl = (await this.getHtml("/admin/ssl-certificate/list"))
+				.querySelectorAll("#ssl-certificate-list-table tbody tr td a")
+				.find(({ classNames, innerText }) => classNames.length === 0 && innerText === siteInfo.data.hosting.vrt_hst.property.certificate_name)!
+				.getAttribute("href")!;
+		} else {
+			certUrl = certLink.getAttribute("href")!;
+		}
 
 		const certHtml = await this.getHtml(certUrl);
 
+		//TODO: Debug "Cannot read property innerText of null" when adding SSL of domain id: 57 on trophy
 		const cert = certHtml.querySelector("#infoCertificate-content-area").innerText;
 		const ca = certHtml.querySelector("#infoCaCertificate-content-area").innerText;
 		const csr = certHtml.querySelector("#infoCsr-content-area").innerText;
@@ -67,14 +79,14 @@ export default class PleskWebScraper {
 	 */
 	private async getCookie() {
 		if(this.sessionInfo.expiration < Date.now()) {
-			const pleskInfo = (await PleskConnectionModel.findOne({ ipAddress: this.ipAddress }).exec())!;
+			const pleskInfo = (await PleskConnectionModel.findOne({ hostname: this.hostname }).exec())!;
 
 			const { sessionInfo } = pleskInfo;
 
 			if(sessionInfo.expiration > Date.now() + (new Date().getTimezoneOffset())) {
 				this.sessionInfo = sessionInfo;
 			} else {
-				const connection = await getPleskApi(this.ipAddress);
+				const connection = await getPleskApi(this.hostname);
 
 				const idleTime = (await connection.server.get()).session_setup.login_timeout * 60 * 1000;
 				const session = (await connection.session.get()).find(sess => sess.id === sessionInfo.cookie);
@@ -82,13 +94,14 @@ export default class PleskWebScraper {
 				if(session === undefined) {
 					//Generate a new session.
 					const sessionId = await connection.server.create_session(pleskInfo.login, {
-						user_ip: await getIpAddress(this.ipAddress),
+						user_ip: await getIpAddress(this.hostname),
 						back_url: ""
 					});
 
+					//TODO: See why the program stops after this log when adding new instances sometimes.
 					const page = await (await getPuppeteerBrowser()).newPage();
 
-					await page.goto(`${pleskInfo.useHttps ? "https" : "http"}://${this.ipAddress}:${pleskInfo.useHttps ? 8443 : 8880}/enterprise/rsession_init.php?PLESKSESSID=${sessionId}`);
+					await page.goto(`${pleskInfo.useHttps ? "https" : "http"}://${this.hostname}:${pleskInfo.useHttps ? 8443 : 8880}/enterprise/rsession_init.php?PLESKSESSID=${sessionId}`);
 
 					await page.close();
 
@@ -114,7 +127,7 @@ export default class PleskWebScraper {
 	 */
 	private async shouldUseHttps() {
 		if(this.useHttps === undefined) {
-			const pleskInfo = await PleskConnectionModel.findOne({ ipAddress: this.ipAddress }).exec();
+			const pleskInfo = await PleskConnectionModel.findOne({ hostname: this.hostname }).exec();
 
 			this.useHttps = pleskInfo!.useHttps;
 		}
@@ -132,12 +145,11 @@ export default class PleskWebScraper {
 	private async getHtml(path: string) {
 		const useHttps = await this.shouldUseHttps();
 		const cookie = await this.getCookie();
-
 		const page = await (await getPuppeteerBrowser()).newPage();
 
 		await page.setExtraHTTPHeaders({ Cookie: `PLESKSESSID${useHttps ? "" : "_INSECURE"}=${cookie}` });
 
-		await page.goto(`${useHttps ? "https" : "http"}://${this.ipAddress}:${useHttps ? 8443 : 8880}/${path}`);
+		await page.goto(`${useHttps ? "https" : "http"}://${this.hostname}:${useHttps ? 8443 : 8880}/${path}`.replaceAll("//", "/"));
 
 		const html = await page.$eval("html", element => element.innerHTML);
 
