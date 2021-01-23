@@ -62,7 +62,7 @@ export default class Server extends Operator<"server"> {
 	 * @returns The value of the property.
 	 */
 	public async get() {
-		return this.xmlApiRequest<IGetResponse, "get">(
+		const response = await this.xmlApiRequest<IGetResponse, "get">(
 			"get",
 			[
 				this.createDataNode("key", ""),
@@ -81,6 +81,14 @@ export default class Server extends Operator<"server"> {
 				this.createDataNode("certificates", "")
 			]
 		);
+
+		//TODO: Have more appropriate (generic way) of "arrayifying" properties of responses.
+		return {
+			...response,
+			"admin-domain-list": {
+				domain: Array.isArray(response["admin-domain-list"].domain) ? response["admin-domain-list"].domain : [ response["admin-domain-list"].domain ]
+			}
+		};
 	}
 
 	/**
