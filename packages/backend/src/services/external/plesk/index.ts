@@ -1,5 +1,14 @@
 //TODO: Extract this library into a separate NPM package.
-import { Operator, SecretKey, Server, Test, Certificate, Webspace, Session, Site } from "./operators";
+import {
+	Operator,
+	SecretKey,
+	Server,
+	Test,
+	Certificate,
+	Webspace,
+	Session,
+	Site
+} from "./operators";
 
 import { PleskConnectionModel } from "@models/pleskConnection";
 
@@ -111,7 +120,11 @@ export class PleskApi {
 	public async testConnection() {
 		const test = new Test(this);
 
-		await test.testConnection();
+		const error = await test.testConnection();
+
+		if(error !== null) {
+			throw new Error(error);
+		}
 	}
 
 	/**

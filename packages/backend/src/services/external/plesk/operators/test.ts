@@ -22,17 +22,11 @@ export default class Test extends Operator<"server"> {
 	 * @returns A promise which resolves to void if the connection is valid, and rejects with an appropriate error if not.
 	 */
 	public async testConnection() {
-		return new Promise<void>((resolve, reject) => {
+		return new Promise<string | null>((resolve, reject) => {
 			this.xmlApiRequest("get", this.createDataNode("stat", ""), true)
-				.then(() => resolve())
+				.then(() => resolve(null))
 				.catch((err: string) => {
-					console.error(err);
-
-					if(err === "You have entered incorrect username or password.") {
-						reject(new ControlledError(403, "Incorrect Plesk login details"));
-					} else {
-						reject(new ControlledError(500, "Could not connect to remote Plesk API, is the URL correct?"));
-					}
+					resolve(err);
 				});
 		});
 	}
